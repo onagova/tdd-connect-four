@@ -4,7 +4,7 @@ require_relative 'string'
 class Board
   BLANK_COLOR = 30
   COLOR = (31..37).to_a
-  COLOR_BG = 47
+  HIGHLIGHT_BG = 47
 
   attr_reader :locked, :winner
 
@@ -169,7 +169,7 @@ class Board
 
   def pretty_print_level(level, highlight_cols = [])
     if highlight_cols.include?(0)
-      print "\u2502".colorize_bg(COLOR_BG)
+      print "\u2502".colorize_bg(HIGHLIGHT_BG)
     else
       print "\u2502"
     end
@@ -180,7 +180,7 @@ class Board
       print ' '
 
       if highlight_cols.include?(col) || highlight_cols.include?(col + 1)
-        print "\u2502".colorize_bg(COLOR_BG)
+        print "\u2502".colorize_bg(HIGHLIGHT_BG)
       else
         print "\u2502"
       end
@@ -189,18 +189,18 @@ class Board
 
   def pretty_print_top(highlight_cols = [])
     if highlight_cols.include?(0)
-      print "\u250c".colorize_bg(COLOR_BG)
+      print "\u250c".colorize_bg(HIGHLIGHT_BG)
     else
       print "\u250c"
     end
 
     0.upto(5).each do |col|
       if highlight_cols.include?(col)
-        3.times { print "\u2500".colorize_bg(COLOR_BG) }
-        print "\u252c".colorize_bg(COLOR_BG)
+        3.times { print "\u2500".colorize_bg(HIGHLIGHT_BG) }
+        print "\u252c".colorize_bg(HIGHLIGHT_BG)
       elsif highlight_cols.include?(col + 1)
         3.times { print "\u2500" }
-        print "\u252c".colorize_bg(COLOR_BG)
+        print "\u252c".colorize_bg(HIGHLIGHT_BG)
       else
         3.times { print "\u2500" }
         print "\u252c"
@@ -208,8 +208,8 @@ class Board
     end
 
     if highlight_cols.include?(6)
-      3.times { print "\u2500".colorize_bg(COLOR_BG) }
-      print "\u2510".colorize_bg(COLOR_BG)
+      3.times { print "\u2500".colorize_bg(HIGHLIGHT_BG) }
+      print "\u2510".colorize_bg(HIGHLIGHT_BG)
     else
       3.times { print "\u2500" }
       print "\u2510"
@@ -218,18 +218,18 @@ class Board
 
   def pretty_print_divider(highlight_cols = [])
     if highlight_cols.include?(0)
-      print "\u251c".colorize_bg(COLOR_BG)
+      print "\u251c".colorize_bg(HIGHLIGHT_BG)
     else
       print "\u251c"
     end
 
     0.upto(5).each do |col|
       if highlight_cols.include?(col)
-        3.times { print "\u2500".colorize_bg(COLOR_BG) }
-        print "\u253c".colorize_bg(COLOR_BG)
+        3.times { print "\u2500".colorize_bg(HIGHLIGHT_BG) }
+        print "\u253c".colorize_bg(HIGHLIGHT_BG)
       elsif highlight_cols.include?(col + 1)
         3.times { print "\u2500" }
-        print "\u253c".colorize_bg(COLOR_BG)
+        print "\u253c".colorize_bg(HIGHLIGHT_BG)
       else
         3.times { print "\u2500" }
         print "\u253c"
@@ -237,8 +237,8 @@ class Board
     end
 
     if highlight_cols.include?(6)
-      3.times { print "\u2500".colorize_bg(COLOR_BG) }
-      print "\u2524".colorize_bg(COLOR_BG)
+      3.times { print "\u2500".colorize_bg(HIGHLIGHT_BG) }
+      print "\u2524".colorize_bg(HIGHLIGHT_BG)
     else
       3.times { print "\u2500" }
       print "\u2524"
@@ -247,18 +247,18 @@ class Board
 
   def pretty_print_bottom(highlight_cols = [])
     if highlight_cols.include?(0)
-      print "\u2514".colorize_bg(COLOR_BG)
+      print "\u2514".colorize_bg(HIGHLIGHT_BG)
     else
       print "\u2514"
     end
 
     0.upto(5).each do |col|
       if highlight_cols.include?(col)
-        3.times { print "\u2500".colorize_bg(COLOR_BG) }
-        print "\u2534".colorize_bg(COLOR_BG)
+        3.times { print "\u2500".colorize_bg(HIGHLIGHT_BG) }
+        print "\u2534".colorize_bg(HIGHLIGHT_BG)
       elsif highlight_cols.include?(col + 1)
         3.times { print "\u2500" }
-        print "\u2534".colorize_bg(COLOR_BG)
+        print "\u2534".colorize_bg(HIGHLIGHT_BG)
       else
         3.times { print "\u2500" }
         print "\u2534"
@@ -266,8 +266,8 @@ class Board
     end
 
     if highlight_cols.include?(6)
-      3.times { print "\u2500".colorize_bg(COLOR_BG) }
-      print "\u2518".colorize_bg(COLOR_BG)
+      3.times { print "\u2500".colorize_bg(HIGHLIGHT_BG) }
+      print "\u2518".colorize_bg(HIGHLIGHT_BG)
     else
       3.times { print "\u2500" }
       print "\u2518"
