@@ -4,6 +4,7 @@ require_relative 'string'
 class Board
   BLANK_COLOR = 30
   COLOR = (31..37).to_a
+  COLOR_BG = 47
 
   attr_reader :locked, :winner
 
@@ -11,6 +12,7 @@ class Board
     @grid = (1..7).map { Array.new(6, BLANK_COLOR) }
     @locked = false
     @winner = nil
+    @win_streak = []
   end
 
   def cloned_grid
@@ -52,6 +54,32 @@ class Board
     puts ''
   end
 
+  def pretty_print_highlight
+    cols = cols_at_levels(@win_streak, 5)
+    pretty_print_top(cols)
+    puts ''
+
+    10.downto(0).each do |j|
+      if j.even?
+        level = j / 2
+        cols = cols_at_levels(@win_streak, level)
+        pretty_print_level(level, cols)
+      else
+        cols = cols_at_levels(@win_streak, (j + 1) / 2, (j - 1) / 2)
+        pretty_print_divider(cols)
+      end
+      puts ''
+    end
+
+    cols = cols_at_levels(@win_streak, 0)
+    pretty_print_bottom(cols)
+    puts ''
+
+    print ' '
+    (1..7).each { |i| print " #{i}  " }
+    puts ''
+  end
+
   def self.out_of_bounds?(col, level)
     col.negative? || col > 6 || level.negative? || level > 5
   end
@@ -78,17 +106,26 @@ class Board
   end
 
   def try_record_winner?(color_code, col, level)
+    streak = nil
     loop do
-      break if horizontal_streak(color_code, col, level) >= 4
-      break if vertical_streak(color_code, col, level) >= 4
-      break if forward_diagonal_streak(color_code, col, level) >= 4
-      break if backward_diagonal_streak(color_code, col, level) >= 4
+      streak = horizontal_streak(color_code, col, level)
+      break if streak.size >= 4
+
+      streak = vertical_streak(color_code, col, level)
+      break if streak.size >= 4
+
+      streak = forward_diagonal_streak(color_code, col, level)
+      break if streak.size >= 4
+
+      streak = backward_diagonal_streak(color_code, col, level)
+      break if streak.size >= 4
 
       return false
     end
 
     @locked = true
     @winner = color_code
+    @win_streak = streak
     true
   end
 
@@ -113,56 +150,127 @@ class Board
   end
 
   def streak(color_code, col, level, direction)
-    result = 0
+    result = []
     next_col = col
     next_level = level
 
     while !Board.out_of_bounds?(next_col, next_level) &&
           @grid[next_col][next_level] == color_code
-      result += 1
+      result << [next_col, next_level]
       next_col += direction[0]
       next_level += direction[1]
     end
     result
   end
 
-  def pretty_print_level(level)
-    print "\u2502"
+  def cols_at_levels(coords, *levels)
+    coords.select { |coord| levels.include?(coord[1]) }.map { |coord| coord[0] }
+  end
+
+  def pretty_print_level(level, highlight_cols = [])
+    if highlight_cols.include?(0)
+      print "\u2502".colorize_bg(COLOR_BG)
+    else
+      print "\u2502"
+    end
+
     0.upto(6).each do |col|
       print ' '
       print "\u25cf".colorize(@grid[col][level])
       print ' '
-      print "\u2502"
+
+      if highlight_cols.include?(col) || highlight_cols.include?(col + 1)
+        print "\u2502".colorize_bg(COLOR_BG)
+      else
+        print "\u2502"
+      end
     end
   end
 
-  def pretty_print_top
-    print "\u250c"
-    6.times do
-      3.times { print "\u2500" }
-      print "\u252c"
+  def pretty_print_top(highlight_cols = [])
+    if highlight_cols.include?(0)
+      print "\u250c".colorize_bg(COLOR_BG)
+    else
+      print "\u250c"
     end
-    3.times { print "\u2500" }
-    print "\u2510"
+
+    0.upto(5).each do |col|
+      if highlight_cols.include?(col)
+        3.times { print "\u2500".colorize_bg(COLOR_BG) }
+        print "\u252c".colorize_bg(COLOR_BG)
+      elsif highlight_cols.include?(col + 1)
+        3.times { print "\u2500" }
+        print "\u252c".colorize_bg(COLOR_BG)
+      else
+        3.times { print "\u2500" }
+        print "\u252c"
+      end
+    end
+
+    if highlight_cols.include?(6)
+      3.times { print "\u2500".colorize_bg(COLOR_BG) }
+      print "\u2510".colorize_bg(COLOR_BG)
+    else
+      3.times { print "\u2500" }
+      print "\u2510"
+    end
   end
 
-  def pretty_print_divider
-    print "\u251c"
-    6.times do
-      3.times { print "\u2500" }
-      print "\u253c"
+  def pretty_print_divider(highlight_cols = [])
+    if highlight_cols.include?(0)
+      print "\u251c".colorize_bg(COLOR_BG)
+    else
+      print "\u251c"
     end
-    3.times { print "\u2500" }
-    print "\u2524"
+
+    0.upto(5).each do |col|
+      if highlight_cols.include?(col)
+        3.times { print "\u2500".colorize_bg(COLOR_BG) }
+        print "\u253c".colorize_bg(COLOR_BG)
+      elsif highlight_cols.include?(col + 1)
+        3.times { print "\u2500" }
+        print "\u253c".colorize_bg(COLOR_BG)
+      else
+        3.times { print "\u2500" }
+        print "\u253c"
+      end
+    end
+
+    if highlight_cols.include?(6)
+      3.times { print "\u2500".colorize_bg(COLOR_BG) }
+      print "\u2524".colorize_bg(COLOR_BG)
+    else
+      3.times { print "\u2500" }
+      print "\u2524"
+    end
   end
 
-  def pretty_print_bottom
-    print "\u2514"
-    6.times do
-      3.times { print "\u2500" }
-      print "\u2534"
+  def pretty_print_bottom(highlight_cols = [])
+    if highlight_cols.include?(0)
+      print "\u2514".colorize_bg(COLOR_BG)
+    else
+      print "\u2514"
     end
-    3.times { print "\u2500" }
-    print "\u2518"
+
+    0.upto(5).each do |col|
+      if highlight_cols.include?(col)
+        3.times { print "\u2500".colorize_bg(COLOR_BG) }
+        print "\u2534".colorize_bg(COLOR_BG)
+      elsif highlight_cols.include?(col + 1)
+        3.times { print "\u2500" }
+        print "\u2534".colorize_bg(COLOR_BG)
+      else
+        3.times { print "\u2500" }
+        print "\u2534"
+      end
+    end
+
+    if highlight_cols.include?(6)
+      3.times { print "\u2500".colorize_bg(COLOR_BG) }
+      print "\u2518".colorize_bg(COLOR_BG)
+    else
+      3.times { print "\u2500" }
+      print "\u2518"
+    end
   end
 end

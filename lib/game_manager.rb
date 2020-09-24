@@ -27,7 +27,7 @@ class GameManager
       system 'clear'
     end
 
-    board.pretty_print
+    board.pretty_print_highlight
     puts ''
     GameManager.declare_winner(board)
   end
